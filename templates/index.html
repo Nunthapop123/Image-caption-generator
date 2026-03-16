@@ -1,0 +1,326 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8-BIT CAPTION GEN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            background: #C0C2B8;
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #D5FF40;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #000000;
+            border: 4px solid #000000;
+            border-radius: 0;
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.8);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .header {
+            background: #000000;
+            color: #D5FF40;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 4px dashed #333;
+        }
+        
+        .header h1 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            line-height: 1.5;
+            text-shadow: 2px 2px 0 #333;
+        }
+        
+        .header p {
+            font-size: 0.6em;
+            color: #C0C2B8;
+            line-height: 1.5;
+        }
+        
+        .content {
+            padding: 40px;
+            background: #000000;
+        }
+        
+        .upload-area {
+            border: 4px dashed #C0C2B8;
+            border-radius: 0;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            background: #000;
+            color: #D5FF40;
+        }
+        
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #D5FF40;
+            background: #111;
+        }
+        
+        .upload-icon {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #D5FF40;
+        }
+        
+        .upload-text {
+            font-size: 0.7em;
+            color: #C0C2B8;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        
+        .file-input { display: none; }
+        
+        .btn {
+            background: #D5FF40;
+            color: #000000;
+            border: 4px solid #D5FF40;
+            padding: 15px 30px;
+            border-radius: 0;
+            font-size: 0.8em;
+            font-family: 'Press Start 2P', monospace;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 4px 4px 0px #C0C2B8;
+            transition: all 0.1s;
+        }
+        
+        .btn:hover {
+            background: #000;
+            color: #D5FF40;
+        }
+        
+        .btn:active {
+            box-shadow: 0px 0px 0px #C0C2B8;
+            transform: translate(4px, 4px);
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 25px 0;
+            font-size: 0.7em;
+            color: #C0C2B8;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .checkbox-container input {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            accent-color: #000;
+            border: 2px solid #D5FF40;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.7em;
+            color: #D5FF40;
+        }
+        
+        .blink {
+            animation: blinker 1s linear infinite;
+        }
+        @keyframes blinker { 50% { opacity: 0; } }
+        
+        .result {
+            display: none;
+            background: #111;
+            border: 4px solid #333;
+            border-radius: 0;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .result-image {
+            max-width: 100%;
+            height: auto;
+            border: 4px solid #C0C2B8;
+            margin-bottom: 20px;
+            image-rendering: auto;
+        }
+        
+        .caption {
+            background: #000;
+            padding: 20px;
+            border: 2px solid #D5FF40;
+            font-size: 0.8em;
+            line-height: 1.6;
+            color: #D5FF40;
+        }
+        
+        .error {
+            background: #000;
+            color: #ff4040;
+            padding: 15px;
+            border: 2px solid #ff4040;
+            margin-top: 20px;
+            font-size: 0.7em;
+        }
+        
+        .file-info {
+            background: #222;
+            padding: 15px;
+            border: 2px solid #C0C2B8;
+            margin-top: 15px;
+            font-size: 0.6em;
+            color: #D5FF40;
+            line-height: 1.5;
+        }
+        
+        .crt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <div class="crt-overlay"></div>
+    <div class="container">
+        <div class="header">
+            <h1>IMAGE <br>CAPTION GENERATOR</h1>
+            <p>> AWAITING INPUT FOR AI ANALYSIS...</p>
+        </div>
+        
+        <div class="content">
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">[+]</div>
+                    <div class="upload-text">CLICK TO SELECT OR DRAG & DROP</div>
+                    <input type="file" id="fileInput" class="file-input" accept="image/*">
+                    <button type="button" class="btn" onclick="document.getElementById('fileInput').click()">
+                        SELECT IMAGE
+                    </button>
+                </div>
+                
+                <div id="fileInfo" class="file-info" style="display: none;"></div>
+                
+                <div class="loading" id="loading">
+                    <p class="blink">> PROCESSING DATA...</p>
+                </div>
+                
+                <div class="result" id="result">
+                    <img id="resultImage" class="result-image" alt="Uploaded image">
+                    <div class="caption" id="caption"></div>
+                </div>
+                
+                <div id="error" class="error" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        const error = document.getElementById('error');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+        
+        function handleFileSelect(file) {
+            if (!file.type.startsWith('image/')) {
+                showError('ERROR: INVALID FILE TYPE.');
+                return;
+            }
+            if (file.size > 16 * 1024 * 1024) {
+                showError('ERROR: FILE SIZE EXCEEDS LIMIT.');
+                return;
+            }
+            
+            fileInfo.innerHTML = `> SELECTED: ${file.name}<br>> SIZE: ${(file.size / 1024 / 1024).toFixed(2)} MB`;
+            fileInfo.style.display = 'block';
+            
+            uploadFile(file);
+        }
+        
+        function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            error.style.display = 'none';
+            
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                loading.style.display = 'none';
+                
+                if (data.success) {
+                    document.getElementById('resultImage').src = data.image;
+                    document.getElementById('caption').textContent = "> " + data.caption.toUpperCase();
+                    result.style.display = 'block';
+                } else {
+                    showError("> ERROR: " + (data.error || 'PROCESSING FAILED.').toUpperCase());
+                }
+            })
+            .catch(err => {
+                loading.style.display = 'none';
+                showError('> SYSTEM ERROR: NETWORK FAILURE.');
+                console.error('Error:', err);
+            });
+        }
+        
+        function showError(message) {
+            error.textContent = message;
+            error.style.display = 'block';
+            result.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
